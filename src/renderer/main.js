@@ -8,7 +8,7 @@ import './assets/style/animations.scss'
 import './assets/style/main.scss'
 import router from './router/index'
 import store from './store/index'
-const { ipcRenderer} = window.electron
+const { ipcRenderer } = window.electron
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -33,5 +33,3 @@ ipcRenderer.on('change-view', (event, data) => {
     router.push(data.route)
   }
 })
-
-

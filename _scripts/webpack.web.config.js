@@ -5,9 +5,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-const {
-  productName,
-} = require('../package.json')
+const { productName } = require('../package.json')
 
 // const externals = Object.keys(dependencies).concat(Object.keys(devDependencies))
 const isDevMode = process.env.NODE_ENV === 'development'
@@ -20,7 +18,6 @@ const config = {
   entry: {
     preload: path.join(__dirname, '../src/electron-web.js'),
     index: path.join(__dirname, '../src/renderer/main.js'),
-
   },
   output: {
     // libraryTarget: 'commonjs2',

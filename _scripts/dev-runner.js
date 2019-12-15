@@ -20,9 +20,7 @@ const remoteDebugging = !!(
   process.argv[2] && process.argv[2] === '--remote-debug'
 )
 
-const isWeb = !!(
-  process.argv[2] && process.argv[2] === '--web'
-)
+const isWeb = !!(process.argv[2] && process.argv[2] === '--web')
 
 if (remoteDebugging) {
   // disable dvtools open in electron
@@ -30,7 +28,6 @@ if (remoteDebugging) {
 }
 
 const vueConfig = isWeb ? webConfig : rendererConfig
-
 
 function electronLog(data, color) {
   console.log(chalk[color].bold(data))
@@ -106,12 +103,14 @@ function startMain() {
     }
   })
 
-  webpackSetup.watch({
-    aggregateTimeout: 500,
-  },
+  webpackSetup.watch(
+    {
+      aggregateTimeout: 500,
+    },
     err => {
       if (err) console.error(err)
-    })
+    }
+  )
 }
 
 function startRenderer(callback) {
@@ -137,9 +136,7 @@ function startRenderer(callback) {
     if (!isWeb) {
       callback()
     }
-
   })
 }
-
 
 startRenderer(startMain)

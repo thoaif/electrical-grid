@@ -1,6 +1,5 @@
 window.electron = {
   ipcRenderer: {
-    on: function() {
-    }
-  }
+    on: function() {},
+  },
 }

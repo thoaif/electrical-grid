@@ -59,7 +59,7 @@ function createWindow() {
       nodeIntegration: true,
       nodeIntegrationInWorker: false,
       webSecurity: false,
-      preload: path.resolve(__dirname, './preload.js')
+      preload: path.resolve(__dirname, './preload.js'),
     },
     show: false,
   })
@@ -82,8 +82,7 @@ function createWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
     mainWindow.focus()
-  })  // Show when loaded
-
+  }) // Show when loaded
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -91,7 +90,7 @@ function createWindow() {
   })
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('change-view', {route: 'hello'})
+    mainWindow.webContents.send('change-view', { route: 'hello' })
   })
 
   mainWindow.on('closed', () => {
