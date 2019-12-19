@@ -2,46 +2,24 @@ import GridModel from './grid-model'
 import {
   ConnectableWithError,
   ConnectionAlreadyExists,
+  ConnectionDoesntExist,
   ConnectionError,
   MaxConnectionError,
   MultipleConnectionErrors,
   SelfConnectionError,
-} from './erros'
+} from './errors'
 
 class Connectable extends GridModel {
   connections: Connectable[]
-  maxConnections: number
-  closed: boolean
+  protected maxConnections: number
+  protected closed: boolean
 
-  constructor(
-    ref: string,
-    maxConnections: number,
-    closed = true,
-    ...connections: Connectable[]
-  ) {
+  constructor(ref: string, maxConnections: number, closed = true) {
     super(ref)
-    if (connections.length > maxConnections) {
-      throw new MaxConnectionError(ref, maxConnections, 0, connections.length)
-    }
 
     this.closed = closed
     this.maxConnections = maxConnections
     this.connections = []
-
-    this.raiseConnectionErrors(this.isConnectableWithMultiple(connections))
-    this.connections = connections
-  }
-
-  isConnectableWithMultiple(
-    connections: Connectable[],
-    existingErrors: ConnectionError[] = []
-  ): ConnectionError[] {
-    const errors = existingErrors
-    for (const connection of connections) {
-      const err = this.isConnectableErrors(connection)
-      errors.push(...err)
-    }
-    return errors
   }
 
   isConnectableWith(connectable: Connectable): boolean {
@@ -67,7 +45,7 @@ class Connectable extends GridModel {
     else if (connectableStrings.includes(connectable.toString())) {
       errors.push(new ConnectionAlreadyExists(this, connectable))
     }
-    if (connectable.connections.length === this.maxConnections)
+    if (this.connections.length === this.maxConnections)
       errors.push(
         new MaxConnectionError(
           this,
@@ -80,10 +58,32 @@ class Connectable extends GridModel {
     return errors
   }
 
-  connect(connectable: Connectable): void {
+  connect(connectable: Connectable, connected = false): void {
     const errors = this.isConnectableErrors(connectable)
     this.raiseConnectionErrors(errors)
     this.connections.push(connectable)
+    try {
+      if (!connected) {
+        connectable.connect(this, true)
+      }
+    } catch (e) {
+      // console.error(e)
+      this.disconnect(connectable, true)
+      throw e
+    }
+  }
+
+  disconnect(connectable: Connectable, disconnected = false): void {
+    const index = this.connections.indexOf(connectable)
+
+    if (index !== -1) {
+      this.connections.splice(index, 1)
+      if (!disconnected) {
+        connectable.disconnect(this, true)
+      }
+    } else {
+      throw new ConnectionDoesntExist(this, connectable)
+    }
   }
 
   raiseConnectionErrors(errors: ConnectionError[]): void {
@@ -92,6 +92,14 @@ class Connectable extends GridModel {
     } else if (errors.length > 1) {
       throw new MultipleConnectionErrors(this, errors)
     }
+  }
+
+  getMaxConnections(): number {
+    return this.maxConnections
+  }
+
+  isClosed(): boolean {
+    return this.closed
   }
 }
 

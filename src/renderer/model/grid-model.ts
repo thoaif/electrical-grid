@@ -1,3 +1,6 @@
+import Connectable from '@/renderer/model/connectable'
+import Feeder from './feeder'
+
 class GridModel {
   ref: string
 
@@ -22,6 +25,10 @@ class GridModel {
   toString(): string {
     return this.ref
   }
+
+  // isFeeder(connectable: Connectable): boolean {
+  //   return connectable instanceof Feeder
+  // }
 
   // TODO: implement feeder function
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

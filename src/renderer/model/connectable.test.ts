@@ -2,11 +2,12 @@ import Connectable from './connectable'
 import {
   ConnectableWithError,
   ConnectionAlreadyExists,
+  ConnectionDoesntExist,
   ConnectionError,
   MaxConnectionError,
   MultipleConnectionErrors,
   SelfConnectionError,
-} from './erros'
+} from './errors'
 
 class SubClassedConnectableNegative extends Connectable {
   isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
@@ -24,36 +25,8 @@ describe('constructor', () => {
   it('defaults', () => {
     const model = new SubClassedConnectablePositive('model', 3)
     expect(model.ref).toBe('model')
-    expect(model.maxConnections).toBe(3)
+    expect(model.getMaxConnections()).toBe(3)
     expect(model.connections).toStrictEqual([])
-  })
-
-  // MaxConnectionError is raised first
-  it('max connection exceeded', () => {
-    const model = new SubClassedConnectablePositive('model', 1)
-    const otherModel = new SubClassedConnectablePositive('otherModel', 1)
-    expect(
-      () => new SubClassedConnectablePositive('ref', 1, true, model, otherModel)
-    ).toThrowError(new MaxConnectionError('ref', 1, 0, 2))
-  })
-
-  it('multiple errors', () => {
-    const model = new SubClassedConnectablePositive('model', 10)
-    const error = new SelfConnectionError(model)
-    expect(
-      () =>
-        new SubClassedConnectablePositive(
-          'model',
-          10,
-          true,
-          model,
-          model,
-          model,
-          model
-        )
-    ).toThrowError(
-      new MultipleConnectionErrors(model, [error, error, error, error])
-    )
   })
 })
 
@@ -75,12 +48,8 @@ describe('isConnectableErrors', () => {
 
   it('connection already exists - with same object', () => {
     const otherModel = new SubClassedConnectablePositive('otherModel', 1)
-    const baseModel = new SubClassedConnectablePositive(
-      'baseModel',
-      2,
-      true,
-      otherModel
-    )
+    const baseModel = new SubClassedConnectablePositive('baseModel', 2, true)
+    baseModel.connect(otherModel)
     const errors = baseModel.isConnectableErrors(otherModel)
     expect(errors).toStrictEqual([
       new ConnectionAlreadyExists(baseModel, otherModel),
@@ -91,12 +60,8 @@ describe('isConnectableErrors', () => {
   it('connection already exists - with different object', () => {
     const otherModel = new SubClassedConnectablePositive('otherModel', 1)
     const anotherModel = new SubClassedConnectablePositive('otherModel', 1)
-    const baseModel = new SubClassedConnectablePositive(
-      'baseModel',
-      2,
-      true,
-      otherModel
-    )
+    const baseModel = new SubClassedConnectablePositive('baseModel', 2, true)
+    baseModel.connect(otherModel)
     const errors = baseModel.isConnectableErrors(anotherModel)
     expect(errors).toStrictEqual([
       new ConnectionAlreadyExists(baseModel, anotherModel),
@@ -175,6 +140,7 @@ describe('connect', () => {
     expect(() => baseModel.connect(baseModel)).toThrow(
       new SelfConnectionError(baseModel)
     )
+    expect(baseModel.connections.length).toBe(0)
   })
 
   it('multiple error', () => {
@@ -186,6 +152,17 @@ describe('connect', () => {
     expect(() => baseModel.connect(baseModel)).toThrow(
       new MultipleConnectionErrors(baseModel, errors)
     )
+    expect(baseModel.connections.length).toBe(0)
+  })
+
+  it('disconnection test', () => {
+    const baseModel = new SubClassedConnectablePositive('baseModel', 2)
+    const otherModel = new SubClassedConnectableNegative('otherModel', 2)
+    expect(() => baseModel.connect(otherModel)).toThrow(
+      new ConnectableWithError(otherModel, baseModel)
+    )
+    expect(baseModel.connections.length).toBe(0)
+    expect(otherModel.connections.length).toBe(0)
   })
 })
 
@@ -194,5 +171,28 @@ describe('isConnectableWith', () => {
     const otherModel = new SubClassedConnectablePositive('otherModel', 1)
     const baseModel = new SubClassedConnectableNegative('baseModel', 2)
     expect(baseModel.isConnectableWith(otherModel)).toBe(false)
+    expect(otherModel.isConnectableWith(baseModel)).toBe(true)
+  })
+})
+
+describe('disconnect', () => {
+  it('valid disconnect', () => {
+    const otherModel = new SubClassedConnectablePositive('otherModel', 1)
+    const baseModel = new SubClassedConnectablePositive('baseModel', 2)
+    baseModel.connect(otherModel)
+    baseModel.disconnect(otherModel)
+    expect(baseModel.connections.length).toBe(0)
+    expect(otherModel.connections.length).toBe(0)
+  })
+
+  it('invalid disconnect', () => {
+    const otherModel = new SubClassedConnectablePositive('otherModel', 1)
+    const baseModel = new SubClassedConnectablePositive('baseModel', 2)
+
+    expect(() => baseModel.disconnect(otherModel)).toThrowError(
+      new ConnectionDoesntExist(baseModel, otherModel)
+    )
+    expect(baseModel.connections.length).toBe(0)
+    expect(otherModel.connections.length).toBe(0)
   })
 })

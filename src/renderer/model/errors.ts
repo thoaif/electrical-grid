@@ -43,7 +43,7 @@ export class ConnectableWithError extends ConnectionError {
     name = 'ConnectableWithError'
   ) {
     if (message === null) {
-      message = `${baseConnectable} is not connectable with ${otherConnectable}`
+      message = `${baseConnectable} (${baseConnectable.constructor.name}) is not connectable with ${otherConnectable} (${otherConnectable.constructor.name})`
     }
 
     super(baseConnectable, message, name)
@@ -56,6 +56,15 @@ export class ConnectionAlreadyExists extends ConnectionError {
   constructor(baseConnectable: Connectable, otherConnectable: Connectable) {
     const message = `${baseConnectable} is already connected with ${otherConnectable}`
     super(baseConnectable, message, 'ConnectionAlreadyExists')
+    this.otherConnectable = otherConnectable
+  }
+}
+
+export class ConnectionDoesntExist extends ConnectionError {
+  otherConnectable: Connectable
+  constructor(baseConnectable: Connectable, otherConnectable: Connectable) {
+    const message = `${baseConnectable} doesn't exit in ${otherConnectable}`
+    super(baseConnectable, message, 'ConnectionDoesntExist')
     this.otherConnectable = otherConnectable
   }
 }

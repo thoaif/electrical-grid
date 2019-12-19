@@ -1,23 +1,19 @@
 import Connectable from './connectable'
-import { Bus } from './bus'
+import Bus from './bus'
 import { Cable } from './cable'
 import {
+  ConnectableWithError,
   ConnectionError,
   SwitchCanHaveOneBusError,
   SwitchCanHaveOneCableError,
   SwitchLockedError,
-} from './erros'
+} from './errors'
 
 class Switch extends Connectable {
-  locked: boolean
+  private locked: boolean
 
-  constructor(
-    ref: string,
-    closed = true,
-    locked = false,
-    ...connections: (Bus | Cable)[]
-  ) {
-    super(ref, 2, closed, ...connections)
+  constructor(ref: string, closed = true, locked = false) {
+    super(ref, 2, closed)
     this.locked = locked
   }
 
@@ -33,24 +29,18 @@ class Switch extends Connectable {
     this.locked = status
   }
 
-  isConnectableWithMultiple(connections: Connectable[]): ConnectionError[] {
-    const buses = connections.filter(con => con instanceof Bus)
-    const cables = connections.filter(con => con instanceof Cable)
-    const errors = []
-    if (buses.length > 1) {
-      errors.push(new SwitchCanHaveOneBusError(this, buses[1]))
-    }
-    if (cables.length > 1) {
-      errors.push(new SwitchCanHaveOneCableError(this, cables[1]))
-    }
-
-    return super.isConnectableWithMultiple(connections, errors)
+  isLocked(): boolean {
+    return this.locked
   }
 
+  // TODO: Implement logic for getting feeder and stuff
   isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
     const errors = []
     const hasBus = this.connections.filter(con => con instanceof Bus).length
     const hasCable = this.connections.filter(con => con instanceof Cable).length
+    if (!(connectable instanceof Bus || connectable instanceof Cable)) {
+      errors.push(new ConnectableWithError(this, connectable))
+    }
     if (hasBus && connectable instanceof Bus) {
       errors.push(new SwitchCanHaveOneBusError(this, connectable))
     }
