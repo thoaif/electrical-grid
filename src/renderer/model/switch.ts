@@ -1,6 +1,6 @@
 import Connectable from './connectable'
 import Bus from './bus'
-import { Cable } from './cable'
+import Cable from './cable'
 import {
   ConnectableWithError,
   ConnectionError,
@@ -8,6 +8,7 @@ import {
   SwitchCanHaveOneCableError,
   SwitchLockedError,
 } from './errors'
+import Feeder from './feeder'
 
 class Switch extends Connectable {
   private locked: boolean
@@ -38,7 +39,13 @@ class Switch extends Connectable {
     const errors = []
     const hasBus = this.connections.filter(con => con instanceof Bus).length
     const hasCable = this.connections.filter(con => con instanceof Cable).length
-    if (!(connectable instanceof Bus || connectable instanceof Cable)) {
+    if (
+      !(
+        connectable instanceof Bus ||
+        connectable instanceof Cable ||
+        connectable instanceof Feeder
+      )
+    ) {
       errors.push(new ConnectableWithError(this, connectable))
     }
     if (hasBus && connectable instanceof Bus) {

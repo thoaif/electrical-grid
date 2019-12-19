@@ -10,7 +10,7 @@ describe('constructor', () => {
     expect(bus.ref).toBe('bus')
     expect(bus.parent).toBe(parent)
     expect(bus.getMaxConnections()).toBe(3)
-    expect(bus.connections).toStrictEqual([])
+    expect(bus.getConnections()).toStrictEqual([])
     expect(bus.isClosed()).toBe(true)
   })
 
@@ -19,7 +19,7 @@ describe('constructor', () => {
     const bus = new Bus('bus', parent, 4)
     expect(bus.ref).toBe('bus')
     expect(bus.parent).toBe(parent)
-    expect(bus.connections).toStrictEqual([])
+    expect(bus.getConnections()).toStrictEqual([])
     expect(bus.getMaxConnections()).toBe(4)
     expect(bus.isClosed()).toBe(true)
   })

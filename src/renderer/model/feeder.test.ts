@@ -7,7 +7,7 @@ describe('constructor', () => {
     const feeder = new Feeder('feeder')
     expect(feeder.ref).toBe('feeder')
     expect(feeder.getMaxConnections()).toBe(1)
-    expect(feeder.connections).toStrictEqual([])
+    expect(feeder.getConnections()).toStrictEqual([])
     expect(feeder.isClosed()).toBe(true)
   })
 })

@@ -10,13 +10,12 @@ import {
 } from './errors'
 
 class Connectable extends GridModel {
-  connections: Connectable[]
+  protected connections: Connectable[]
   protected maxConnections: number
   protected closed: boolean
 
   constructor(ref: string, maxConnections: number, closed = true) {
     super(ref)
-
     this.closed = closed
     this.maxConnections = maxConnections
     this.connections = []
@@ -96,6 +95,10 @@ class Connectable extends GridModel {
 
   getMaxConnections(): number {
     return this.maxConnections
+  }
+
+  getConnections(): Connectable[] {
+    return this.connections
   }
 
   isClosed(): boolean {
