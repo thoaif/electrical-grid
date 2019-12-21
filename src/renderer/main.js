@@ -1,4 +1,4 @@
-// import the styles
+/* eslint-disable */
 import 'bulma-pro/bulma.sass'
 
 import 'material-design-icons/iconfont/material-icons.css'

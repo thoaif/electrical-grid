@@ -1,12 +1,18 @@
 import Connectable from './connectable'
-import { ConnectableWithError, ConnectionError } from '@/renderer/model/errors'
+import { ConnectableWithError } from './errors'
 import Switch from './switch'
-import Feeder from './feeder'
-import Bus from './bus'
 
 class Cable extends Connectable {
   constructor(ref: string) {
     super(ref, 2, true)
+  }
+
+  isConnectableErrors(connectable: Connectable): ConnectableWithError[] {
+    const errors = []
+    if (!(connectable instanceof Switch)) {
+      errors.push(new ConnectableWithError(this, connectable))
+    }
+    return errors
   }
 }
 

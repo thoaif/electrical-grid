@@ -1,13 +1,13 @@
 import Connectable from './connectable'
 import Switch from './switch'
-import { ConnectableWithError, ConnectionError } from './errors'
+import { ConnectableWithError } from './errors'
 
 class Feeder extends Connectable {
   constructor(ref: string) {
     super(ref, 1, true)
   }
 
-  isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
+  isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     const errors = []
     if (!(connectable instanceof Switch)) {
       errors.push(new ConnectableWithError(this, connectable))

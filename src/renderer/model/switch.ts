@@ -1,44 +1,51 @@
 import Connectable from './connectable'
 import Bus from './bus'
 import Cable from './cable'
-import {
-  ConnectableWithError,
-  ConnectionError,
-  SwitchCanHaveOneBusError,
-  SwitchCanHaveOneCableError,
-  SwitchLockedError,
-} from './errors'
+import { ConnectableWithError, SwitchLockedError } from './errors'
 import Feeder from './feeder'
 
 class Switch extends Connectable {
-  private locked: boolean
+  private _locked: boolean
 
   constructor(ref: string, closed = true, locked = false) {
     super(ref, 2, closed)
-    this.locked = locked
+    this._locked = locked
   }
 
-  setClosed(status: boolean, override = false): void {
-    if (override || !this.locked) {
-      this.closed = status
+  private setClosed(status: boolean, override = false): void {
+    if (override || !this._locked) {
+      this._closed = status
     } else {
       throw new SwitchLockedError(this)
     }
   }
 
-  setLocked(status: boolean): void {
-    this.locked = status
+  open(override = false): void {
+    if (this._closed) {
+      this.setClosed(false, override)
+    }
   }
 
-  isLocked(): boolean {
-    return this.locked
+  close(override = false): void {
+    if (!this._closed) {
+      this.setClosed(true, override)
+    }
   }
 
-  // TODO: Implement logic for getting feeder and stuff
-  isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
+  toggle(override = false): void {
+    this.setClosed(!this._closed, override)
+  }
+
+  get locked(): boolean {
+    return this._locked
+  }
+
+  set locked(status: boolean) {
+    this._locked = status
+  }
+
+  isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     const errors = []
-    const hasBus = this.connections.filter(con => con instanceof Bus).length
-    const hasCable = this.connections.filter(con => con instanceof Cable).length
     if (
       !(
         connectable instanceof Bus ||
@@ -48,20 +55,7 @@ class Switch extends Connectable {
     ) {
       errors.push(new ConnectableWithError(this, connectable))
     }
-    if (hasBus && connectable instanceof Bus) {
-      errors.push(new SwitchCanHaveOneBusError(this, connectable))
-    }
-    if (hasCable && connectable instanceof Cable) {
-      errors.push(new SwitchCanHaveOneCableError(this, connectable))
-    }
     return errors
-  }
-
-  getBus(): Bus | null {
-    for (const con of this.connections) {
-      if (con instanceof Bus) return con
-    }
-    return null
   }
 }
 

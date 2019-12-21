@@ -98,6 +98,7 @@
     "jest:coverage": "jest --collect-coverage",
     "jest:watch": "jest --watch",
     "lint": "eslint --fix --ext .js,.ts,.vue ./",
+    "lint-ts": "eslint --fix --ext .ts ./",
     "pack": "run-p pack:main pack:renderer pack:workers",
     "pack:main": "webpack --mode=production --env.NODE_ENV=production --hide-modules --config _scripts/webpack.main.config.js",
     "pack:renderer": "webpack --mode=production --env.NODE_ENV=production --hide-modules --config _scripts/webpack.renderer.config.js",
@@ -113,7 +114,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "pretty-quick --staged && yarn run lint-ts && jest"
     }
   },
   "version": "0.0.1"

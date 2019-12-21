@@ -9,16 +9,16 @@ import {
   SelfConnectionError,
 } from './errors'
 
-class Connectable extends GridModel {
-  protected connections: Connectable[]
-  protected maxConnections: number
-  protected closed: boolean
+abstract class Connectable extends GridModel {
+  protected _connections: Connectable[]
+  protected _maxConnections: number
+  protected _closed: boolean
 
   constructor(ref: string, maxConnections: number, closed = true) {
     super(ref)
-    this.closed = closed
-    this.maxConnections = maxConnections
-    this.connections = []
+    this._closed = closed
+    this._maxConnections = maxConnections
+    this._connections = []
   }
 
   isConnectableWith(connectable: Connectable): boolean {
@@ -26,9 +26,10 @@ class Connectable extends GridModel {
     return !errors.length
   }
 
-  isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     console.warn('isConnectableWithErrors has to be implemented')
-    return []
+    return [new ConnectableWithError(this, connectable)]
   }
 
   isConnectable(connectable: Connectable): boolean {
@@ -38,18 +39,18 @@ class Connectable extends GridModel {
 
   isConnectableErrors(connectable: Connectable): ConnectionError[] {
     const errors = []
-    const connectableStrings = this.connections.map(con => con.toString())
+    const connectableStrings = this._connections.map(con => con.toString())
     if (connectable.toString() === this.toString())
       errors.push(new SelfConnectionError(this))
     else if (connectableStrings.includes(connectable.toString())) {
       errors.push(new ConnectionAlreadyExists(this, connectable))
     }
-    if (this.connections.length === this.maxConnections)
+    if (this._connections.length === this._maxConnections)
       errors.push(
         new MaxConnectionError(
           this,
-          this.maxConnections,
-          this.connections.length,
+          this._maxConnections,
+          this._connections.length,
           1
         )
       )
@@ -60,7 +61,7 @@ class Connectable extends GridModel {
   connect(connectable: Connectable, connected = false): void {
     const errors = this.isConnectableErrors(connectable)
     this.raiseConnectionErrors(errors)
-    this.connections.push(connectable)
+    this._connections.push(connectable)
     try {
       if (!connected) {
         connectable.connect(this, true)
@@ -73,10 +74,10 @@ class Connectable extends GridModel {
   }
 
   disconnect(connectable: Connectable, disconnected = false): void {
-    const index = this.connections.indexOf(connectable)
+    const index = this._connections.indexOf(connectable)
 
     if (index !== -1) {
-      this.connections.splice(index, 1)
+      this._connections.splice(index, 1)
       if (!disconnected) {
         connectable.disconnect(this, true)
       }
@@ -93,16 +94,16 @@ class Connectable extends GridModel {
     }
   }
 
-  getMaxConnections(): number {
-    return this.maxConnections
+  get maxConnections(): number {
+    return this._maxConnections
   }
 
-  getConnections(): Connectable[] {
-    return this.connections
+  get connections(): Connectable[] {
+    return this._connections
   }
 
-  isClosed(): boolean {
-    return this.closed
+  get closed(): boolean {
+    return this._closed
   }
 }
 

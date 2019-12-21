@@ -1,8 +1,5 @@
-import Connectable from '@/renderer/model/connectable'
-import Feeder from './feeder'
-
-class GridModel {
-  ref: string
+abstract class GridModel {
+  private ref: string
 
   constructor(ref: string) {
     this.ref = ref
@@ -26,14 +23,13 @@ class GridModel {
     return this.ref
   }
 
-  // isFeeder(connectable: Connectable): boolean {
-  //   return connectable instanceof Feeder
-  // }
+  set name(ref: string) {
+    this.ref = ref
+  }
 
-  // TODO: implement feeder function
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  feeder(): {}
+  get name(): string {
+    return this.ref
+  }
 }
 
 export default GridModel

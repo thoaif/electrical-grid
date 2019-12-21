@@ -1,17 +1,17 @@
 import Connectable from './connectable'
 import SubStation from './sub-station'
 import Switch from './switch'
-import { ConnectableWithError, ConnectionError } from './errors'
+import { ConnectableWithError } from './errors'
 
 class Bus extends Connectable {
-  parent: SubStation
+  private _parent: SubStation
 
   constructor(ref: string, parent: SubStation, maxConnections = 3) {
     super(ref, maxConnections, true)
-    this.parent = parent
+    this._parent = parent
   }
 
-  isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
+  isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     const errors = []
     if (!(connectable instanceof Switch)) {
       errors.push(new ConnectableWithError(this, connectable))
@@ -19,8 +19,20 @@ class Bus extends Connectable {
     return errors
   }
 
-  setMaxConnections(maxConnections: number) {
-    this.maxConnections = maxConnections
+  set maxConnections(maxConnections: number) {
+    this._maxConnections = maxConnections
+  }
+
+  get maxConnections(): number {
+    return super.maxConnections
+  }
+
+  set parent(parent: SubStation) {
+    this._parent = parent
+  }
+
+  get parent(): SubStation {
+    return this._parent
   }
 }
 

@@ -16,6 +16,7 @@ class SubClassedConnectableNegative extends Connectable {
 }
 
 class SubClassedConnectablePositive extends Connectable {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
     return []
   }
@@ -24,9 +25,9 @@ class SubClassedConnectablePositive extends Connectable {
 describe('constructor', () => {
   it('defaults', () => {
     const model = new SubClassedConnectablePositive('model', 3)
-    expect(model.ref).toBe('model')
-    expect(model.getMaxConnections()).toBe(3)
-    expect(model.getConnections()).toStrictEqual([])
+    expect(model.name).toBe('model')
+    expect(model.maxConnections).toBe(3)
+    expect(model.connections).toStrictEqual([])
   })
 })
 
@@ -127,12 +128,12 @@ describe('connect', () => {
     const otherModel = new SubClassedConnectablePositive('otherModel', 1)
     const anotherModel = new SubClassedConnectablePositive('anotherModel', 1)
     expect(() => baseModel.connect(otherModel)).not.toThrow()
-    expect(baseModel.getConnections()[0]).toBe(otherModel)
-    expect(baseModel.getConnections().length).toBe(1)
+    expect(baseModel.connections[0]).toBe(otherModel)
+    expect(baseModel.connections.length).toBe(1)
 
     expect(() => baseModel.connect(anotherModel)).not.toThrow()
-    expect(baseModel.getConnections()[1]).toBe(anotherModel)
-    expect(baseModel.getConnections().length).toBe(2)
+    expect(baseModel.connections[1]).toBe(anotherModel)
+    expect(baseModel.connections.length).toBe(2)
   })
 
   it('1 error', () => {
@@ -140,7 +141,7 @@ describe('connect', () => {
     expect(() => baseModel.connect(baseModel)).toThrow(
       new SelfConnectionError(baseModel)
     )
-    expect(baseModel.getConnections().length).toBe(0)
+    expect(baseModel.connections.length).toBe(0)
   })
 
   it('multiple error', () => {
@@ -152,7 +153,7 @@ describe('connect', () => {
     expect(() => baseModel.connect(baseModel)).toThrow(
       new MultipleConnectionErrors(baseModel, errors)
     )
-    expect(baseModel.getConnections().length).toBe(0)
+    expect(baseModel.connections.length).toBe(0)
   })
 
   it('disconnection test', () => {
@@ -161,8 +162,8 @@ describe('connect', () => {
     expect(() => baseModel.connect(otherModel)).toThrow(
       new ConnectableWithError(otherModel, baseModel)
     )
-    expect(baseModel.getConnections().length).toBe(0)
-    expect(otherModel.getConnections().length).toBe(0)
+    expect(baseModel.connections.length).toBe(0)
+    expect(otherModel.connections.length).toBe(0)
   })
 })
 
@@ -181,8 +182,8 @@ describe('disconnect', () => {
     const baseModel = new SubClassedConnectablePositive('baseModel', 2)
     baseModel.connect(otherModel)
     baseModel.disconnect(otherModel)
-    expect(baseModel.getConnections().length).toBe(0)
-    expect(otherModel.getConnections().length).toBe(0)
+    expect(baseModel.connections.length).toBe(0)
+    expect(otherModel.connections.length).toBe(0)
   })
 
   it('invalid disconnect', () => {
@@ -192,7 +193,7 @@ describe('disconnect', () => {
     expect(() => baseModel.disconnect(otherModel)).toThrowError(
       new ConnectionDoesntExist(baseModel, otherModel)
     )
-    expect(baseModel.getConnections().length).toBe(0)
-    expect(otherModel.getConnections().length).toBe(0)
+    expect(baseModel.connections.length).toBe(0)
+    expect(otherModel.connections.length).toBe(0)
   })
 })
