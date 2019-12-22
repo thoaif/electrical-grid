@@ -1,18 +1,23 @@
-import Connectable from './connectable'
-import Switch from './switch'
-import { ConnectableWithError } from './errors'
+import Connectable from '@/renderer/model/connectable'
+import { ConnectableWithError } from '@/renderer/model/errors'
+import Closeable from '@/renderer/model/closeable'
+import Cable from '@/renderer/model/cable'
 
-class Feeder extends Connectable {
-  constructor(ref: string) {
-    super(ref, 1, true)
+class Feeder extends Closeable {
+  constructor(ref: string, closed = true, locked = false) {
+    super(ref, 1, closed, locked)
   }
 
   isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     const errors = []
-    if (!(connectable instanceof Switch)) {
+    if (!(connectable instanceof Cable)) {
       errors.push(new ConnectableWithError(this, connectable))
     }
     return errors
+  }
+
+  connect(connectable: Cable, connected = false): void {
+    return super.connect(connectable, connected)
   }
 }
 
