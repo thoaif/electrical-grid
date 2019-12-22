@@ -79,33 +79,9 @@ export class MultipleConnectionErrors extends ConnectionError {
   }
 }
 
-export class SwitchLockedError extends ConnectionError {
+export class ClosableLockedError extends ConnectionError {
   constructor(baseConnectable: Connectable) {
     const message = `${baseConnectable} is locked - cannot change closed state`
-    super(baseConnectable, message, 'SwitchLockedError')
-  }
-}
-
-export class SwitchCanHaveOneBusError extends ConnectableWithError {
-  constructor(baseConnectable: Connectable, otherConnectable: Connectable) {
-    const message = `${baseConnectable} can only have one Bus`
-    super(
-      baseConnectable,
-      otherConnectable,
-      message,
-      'SwitchCanHaveOneBusError'
-    )
-  }
-}
-
-export class SwitchCanHaveOneCableError extends ConnectableWithError {
-  constructor(baseConnectable: Connectable, otherConnectable: Connectable) {
-    const message = `${baseConnectable} can only have one Bus`
-    super(
-      baseConnectable,
-      otherConnectable,
-      message,
-      'SwitchCanHaveOneCableError'
-    )
+    super(baseConnectable, message, 'ClosableLockedError')
   }
 }

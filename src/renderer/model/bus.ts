@@ -1,14 +1,14 @@
-import Connectable from './connectable'
-import SubStation from './sub-station'
-import Switch from './switch'
-import { ConnectableWithError } from './errors'
+import Connectable from '@/renderer/model/connectable'
+import SubStation from '@/renderer/model/sub-station'
+import Switch from '@/renderer/model/switch'
+import { ConnectableWithError } from '@/renderer/model/errors'
 
 class Bus extends Connectable {
-  private _parent: SubStation
+  private _parent: SubStation | null
 
-  constructor(ref: string, parent: SubStation, maxConnections = 3) {
+  constructor(ref: string, maxConnections = 3) {
     super(ref, maxConnections, true)
-    this._parent = parent
+    this._parent = null
   }
 
   isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
@@ -19,6 +19,16 @@ class Bus extends Connectable {
     return errors
   }
 
+  connect(connectable: Switch, connected = false): void {
+    return super.connect(connectable, connected)
+  }
+
+  removeParent(): void {
+    if (this._parent !== null) {
+      this._parent.removeChild(this)
+    }
+  }
+
   set maxConnections(maxConnections: number) {
     this._maxConnections = maxConnections
   }
@@ -27,11 +37,11 @@ class Bus extends Connectable {
     return super.maxConnections
   }
 
-  set parent(parent: SubStation) {
+  set parent(parent: SubStation | null) {
     this._parent = parent
   }
 
-  get parent(): SubStation {
+  get parent(): SubStation | null {
     return this._parent
   }
 }

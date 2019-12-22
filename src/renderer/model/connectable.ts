@@ -1,4 +1,4 @@
-import GridModel from './grid-model'
+import GridModel from '@/renderer/model/grid-model'
 import {
   ConnectableWithError,
   ConnectionAlreadyExists,
@@ -7,7 +7,7 @@ import {
   MaxConnectionError,
   MultipleConnectionErrors,
   SelfConnectionError,
-} from './errors'
+} from '@/renderer/model/errors'
 
 abstract class Connectable extends GridModel {
   protected _connections: Connectable[]
@@ -26,7 +26,6 @@ abstract class Connectable extends GridModel {
     return !errors.length
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     console.warn('isConnectableWithErrors has to be implemented')
     return [new ConnectableWithError(this, connectable)]
@@ -67,7 +66,6 @@ abstract class Connectable extends GridModel {
         connectable.connect(this, true)
       }
     } catch (e) {
-      // console.error(e)
       this.disconnect(connectable, true)
       throw e
     }

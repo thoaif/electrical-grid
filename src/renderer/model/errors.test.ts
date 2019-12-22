@@ -1,4 +1,4 @@
-import * as errors from './errors'
+import * as errors from '@/renderer/model/errors'
 
 describe('name match test', () => {
   it('name', () => {

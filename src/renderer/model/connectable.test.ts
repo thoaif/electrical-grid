@@ -1,23 +1,22 @@
-import Connectable from './connectable'
+import Connectable from '@/renderer/model/connectable'
 import {
   ConnectableWithError,
   ConnectionAlreadyExists,
   ConnectionDoesntExist,
-  ConnectionError,
   MaxConnectionError,
   MultipleConnectionErrors,
   SelfConnectionError,
-} from './errors'
+} from '@/renderer/model/errors'
 
 class SubClassedConnectableNegative extends Connectable {
-  isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
+  isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     return [new ConnectableWithError(this, connectable)]
   }
 }
 
 class SubClassedConnectablePositive extends Connectable {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isConnectableWithErrors(connectable: Connectable): ConnectionError[] {
+  isConnectableWithErrors(connectable: Connectable): ConnectableWithError[] {
     return []
   }
 }

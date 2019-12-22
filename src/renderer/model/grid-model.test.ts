@@ -1,4 +1,4 @@
-import GridModel from './grid-model'
+import GridModel from '@/renderer/model/grid-model'
 
 class GridModelSubClassed extends GridModel {}
 
